@@ -132,8 +132,20 @@ function getAllOrNothing(promises) {
  * [Promise.resolve(1), Promise.resolve(2), Promise.resolve(3)] => Promise fulfilled with [1, 2, 3]
  * [Promise.resolve(1), Promise.reject(2), Promise.resolve(3)]  => Promise fulfilled with [1, null, 3]
  */
-function getAllResult(/* promises */) {
-  throw new Error('Not implemented');
+function getAllResult(promises) {
+  return new Promise((resolve) => {
+    const arr = [];
+    Promise.allSettled(promises).then((results) => {
+      results.forEach((result) => {
+        if (result.status === 'rejected') {
+          arr.push(null);
+        } else {
+          arr.push(result.value);
+        }
+      });
+      resolve(arr);
+    });
+  });
 }
 
 /**
@@ -154,8 +166,20 @@ function getAllResult(/* promises */) {
  * [promise1, promise4, promise3] => Promise.resolved('104030')
  * [promise1, promise4, promise3, promise2] => Promise.resolved('10403020')
  */
-function queuPromises(/* promises */) {
-  throw new Error('Not implemented');
+function queuPromises(promises) {
+  return new Promise((resolve) => {
+    const arr = [];
+    let count = 0;
+    promises.forEach((promise, idx) => {
+      promise.then((res) => {
+        arr[idx] = res;
+        count += 1;
+        if (count === promises.length) {
+          resolve(arr.join(''));
+        }
+      });
+    });
+  });
 }
 
 module.exports = {
